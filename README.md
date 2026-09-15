@@ -1,365 +1,188 @@
-# Advanced PDF Text & Image Extraction
+# 📄 Advanced PDF Text & Image Extractor
 
-A Python tool that uses [PyMuPDF](https://pymupdf.readthedocs.io/) to extract
-**text**, **raster images**, **vector figures** (flowcharts, pie charts,
-chemical diagrams), and **tables** from any PDF — with smart caption detection,
-column-aware layout analysis, and a JSON manifest linking every image back to
-its source page and caption.
+> A powerful, beginner-friendly Python tool that extracts **everything** from PDF files — plain text, photos, vector diagrams (flowcharts, pie charts, chemical structures), and tables — with automatic caption matching and zero missing labels!
 
-## ⚡ Quick Setup
+---
 
-### 1. Clone the repository
+## 🌟 What Does This Tool Do?
+
+Most PDF tools struggle with vector diagrams, flowcharts, or tables, often cropping off labels or skipping non-image figures entirely. This tool fixes that:
+
+- 📝 **Full Text Extraction**: Extracts clean plain text with clear page markers.
+- 🖼️ **Embedded Photo Extraction**: Extracts all high-res photos (JPEG/PNG).
+- 🎨 **Vector Diagram & Flowchart Capture**: Automatically crops flowcharts, pie charts, and chemical molecules **with all text labels intact**.
+- 📊 **Smart Table Detection**: Converts complex tables into clean Markdown (`.md`) format using machine learning layout analysis.
+- 🏷️ **Caption Matching**: Links every image and diagram to its exact caption (e.g., `Figure 1.4: Requirements...`).
+
+---
+
+## 🚀 Beginner Quick-Start Guide (Step-by-Step)
+
+No complex configuration needed! Follow these 4 easy steps to run the project.
+
+### Step 1: Clone the Repository
+Open your Terminal (Mac/Linux) or Command Prompt / PowerShell (Windows) and run:
 
 ```bash
 git clone https://github.com/keplar-404/advanced-pdf-text-and-image-extraction.git
 cd advanced-pdf-text-and-image-extraction
 ```
 
-### 2. Create and activate a Python virtual environment
+---
 
-```bash
-python3 -m venv .venv
-```
+### Step 2: Create a Virtual Environment
+
+A virtual environment keeps the project dependencies isolated and clean.
 
 **On Linux / macOS:**
 ```bash
+python3 -m venv .venv
 source .venv/bin/activate
 ```
 
 **On Windows:**
-```bash
+```cmd
+python -m venv .venv
 .venv\Scripts\activate
 ```
 
-> You should see `(.venv)` appear at the start of your terminal prompt.
+*(You will see `(.venv)` appear at the start of your terminal prompt).*
 
-### 3. Install all required packages
+---
+
+### Step 3: Install Required Packages
+
+Run this single command to install all dependencies:
 
 ```bash
 pip install pymupdf pillow pymupdf-layout
 ```
 
-| Package | Purpose |
+| Package | What it does |
 |---|---|
-| `pymupdf` | Core PDF parsing and rendering engine |
-| `pillow` | Image processing (PNG/JPEG saving) |
-| `pymupdf-layout` | Advanced ML-based table detection (uses ONNX model) |
-
-### 4. Run the extractor on your PDF
-
-```bash
-python extract_pdf.py path/to/your_file.pdf
-```
-
-That's it! Output is automatically saved next to your PDF in a folder named `your_file_extracted/`.
+| `pymupdf` | Parses PDF pages, extracts text, images, and drawings |
+| `pillow` | Saves and converts images into PNG/JPEG format |
+| `pymupdf-layout` | Machine learning model for advanced table boundary detection |
 
 ---
 
-## 📁 Output Structure
+### Step 4: Extract Your PDF!
 
-```
-your_file_extracted/
-├── extract.txt                    # All page text with PAGE N headers
-├── extract_log.txt                # Detailed processing log
-├── layout.json                    # Column layout analysis per page
-├── drawings.json                  # Vector drawing classification per page
-├── tables/
-│   ├── page013_table01.md         # Detected data tables as Markdown
-│   └── page021_table01.md
-└── extract_images/
-    ├── manifest.json              # JSON index: every image + caption metadata
-    ├── page007_vec01.png          # Vector figures (flowcharts, diagrams, charts)
-    └── page024_img01_xref137.png  # Embedded raster photos
-```
-
-## ⚙️ Options
+Run the script on any PDF file:
 
 ```bash
-# Use a custom output directory
-python extract_pdf.py input.pdf --output-dir /path/to/output/
-
-# Skip images smaller than N pixels (filters out tiny icons)
-python extract_pdf.py input.pdf --min-dim 16
+python extract_pdf.py path/to/your_document.pdf
 ```
 
-## 📋 Files in this Repository
+🎉 **Done!** An output folder named `your_document_extracted/` will be created right next to your PDF.
 
-| File | Purpose |
-|---|---|
-| `extract_pdf.py` | **Main script** — run this on any PDF |
-| `make_fixture.py` | Builds `sample.pdf` test fixture |
-| `make_chart.py` | Builds a test chart image |
-| `make_overlay_fixture.py` | Builds `overlay.pdf` for overlay classification tests |
-| `make_realworld_fixture.py` | Builds `realworld.pdf` for table/layout tests |
-| `show_overlay.py` | Prints text-overlay classification for each image |
-| `test_extract.py` | Sanity-checks extracted images against known colors |
+---
 
-# (optionally, for re-building the test fixture)
-pip install reportlab
+## 📁 What Files Do You Get?
+
+Inside the generated output directory:
+
+```
+your_document_extracted/
+├── extract.txt                    # Complete plain text of the PDF with page dividers
+├── extract_log.txt                # Processing log and timestamps
+├── layout.json                    # Column layout details per page
+├── drawings.json                  # Vector shape details
+├── tables/                        # Markdown files for every table found
+│   ├── page016_table01.md
+│   └── page038_table01.md
+└── extract_images/                # Extracted images and figures
+    ├── manifest.json              # Machine-readable JSON index with captions & metadata
+    ├── page016_vec01.png          # Complete flowchart (with text labels)
+    ├── page025_vec01.png          # Complete pie chart (with percentage labels)
+    └── page024_img01_xref137.png  # Embedded photos/raster images
 ```
 
-> PyMuPDF 1.24+ exposes itself as `pymupdf`.  The script also falls back to
-> the legacy `fitz` name if you have an older install.
+---
 
-## Usage
+## ⚙️ Command-Line Options
+
+You can customize how the script runs with optional flags:
 
 ```bash
-python extract_pdf.py path/to/some.pdf
-# or with explicit options
-python extract_pdf.py some.pdf --output-dir out/ --min-dim 16
+# 1. Custom output directory
+python extract_pdf.py my_doc.pdf --output-dir /path/to/my_output/
+
+# 2. Filter out tiny icon pixels (default minimum size is 8px)
+python extract_pdf.py my_doc.pdf --min-dim 16
 ```
 
-| Flag            | Default                                  | Description                                            |
-| --------------- | ---------------------------------------- | ------------------------------------------------------ |
-| `pdf`           | *(required, positional)*                 | Path to the input PDF.                                 |
-| `--output-dir`  | `<pdf-stem>_extracted/` next to the PDF  | Where to write `extract.txt`, `extract_images/`, etc.  |
-| `--min-dim`     | `8`                                      | Skip images whose width **or** height is below this.   |
+---
 
-## What you get
+## 🧠 Deep Dive: Technical Architecture (For Developers)
 
-```
-extracted_sample/
-├── extract.txt              # All page text, with clear "PAGE n" separators.
-├── extract_log.txt          # Human-readable log + summary.
-├── layout.json              # Per-page column count + per-column bboxes.
-├── drawings.json            # Per-page vector drawing classification.
-└── extract_images/
-    ├── manifest.json        # Machine-readable list of every image + page ref.
-    ├── page001_img01_xref8.png
-    ├── page002_img01_xref16.png
-    └── page002_img02_xref18.png
-└── tables/                  # (only if PyMuPDF find_tables() finds real tables)
-    ├── page003_table01.md   # Each table is a Markdown file with row separators.
-    └── page005_table01.md
-```
+If you are a developer looking to understand how the extraction pipeline works under the hood, here is the architecture breakdown:
 
-### Image filenames
+### Pipeline Overview
 
-Every image file is named so the source page is obvious at a glance:
-
-```
-page{PAGE}_img{SEQ}_xref{XREF}.{ext}
-   │       │       │          │
-   │       │       │          └─ original image extension (png, jpeg, …)
-   │       │       └─ PDF xref of the image (useful for dedup)
-   │       └─ sequence index on that page (1-based)
-   └─ source page number (1-based)
+```mermaid
+flowchart TD
+    A["Input PDF File"] --> B["Page Loop (0..N)"]
+    
+    B --> C["1. Text Extraction"]
+    C --> C1["extract.txt + Page Markers"]
+    
+    B --> D["2. Raster Image Extraction"]
+    D --> D1["page.get_images() -> Extract XREF"]
+    D1 --> D2["_find_nearby_caption()"]
+    
+    B --> E["3. Caption-Anchored Vector Figure Extraction"]
+    E --> E1["Find Caption Blocks ('Figure X.Y')"]
+    E1 --> E2["Collect Above Text Blocks & Drawing Paths"]
+    E2 --> E3["Union Bounding Rect + 10pt Padding"]
+    E3 --> E4["page.get_pixmap(clip=rect)"]
+    
+    B --> F["4. Table Extraction"]
+    F --> F1["pymupdf-layout / page.find_tables()"]
+    F1 --> F2["Convert to Markdown (.md)"]
+    
+    C1 --> G["Output Manifest & Files"]
+    D2 --> G
+    E4 --> G
+    F2 --> G
 ```
 
-### Manifest format
+### Key Algorithms Explained
 
-`extract_images/manifest.json` is an array of entries like:
+1. **Caption-Anchored Figure Extraction (`_collect_figure_regions_from_captions`)**:
+   - Rather than naive spatial clustering of drawing paths (which fragments figures into dozens of sub-images), the tool scans for caption text blocks (`Figure X.Y`).
+   - It works backwards from the caption: gathering all short text label blocks and vector drawing paths in the same column zone above the caption.
+   - It computes the union bounding rectangle, applies 10 pt padding, and renders a single, clean, fully-labeled figure image.
 
-```json
-{
-  "path": "extract_images/page002_img01_xref16.png",
-  "xref": 16,
-  "page": 2,
-  "page_label": "2",
-  "width": 256,
-  "height": 256,
-  "ext": "png",
-  "size_bytes": 1225,
-  "colorspace": 3,
-  "has_mask": false,
-  "first_occurrence_only": true,
-  "nearby_caption": null
-}
-```
+2. **Non-Breaking Space Normalization (`_NON_BREAKING_TRANS`)**:
+   - Uses `str.maketrans` to convert non-breaking spaces (`\xa0`) and en-spaces (`\u2002`) to standard spaces prior to regex evaluation.
+   - Ensures multi-word section numbers and figure titles like `Figure\xa01.4` match cleanly.
 
-`first_occurrence_only: false` entries point at an image that was already
-saved under another page (the same xref referenced from a different page);
-their `path` is `null` and the original is the entry with
-`first_occurrence_only: true` and the same `xref`.
+3. **Raster Image Overlap Filter (`_has_raster_image_already`)**:
+   - Prevents duplicate renders by measuring area intersection (`rect & region_rect`). If a raster image covers >70% of a vector region, the vector render step skips it.
 
-### `nearby_caption` — finding the right image by content
+4. **Structured Manifest Output (`manifest.json`)**:
+   - Every extracted asset is registered in `manifest.json` with page number, resolution, dimensions, bounding box coordinates, drawing count, and associated `nearby_caption`.
 
-The `nearby_caption` field is the secret weapon for downstream agents.
-Many PDFs (especially academic / LaTeX papers) have **figure floats** that
-sit on a different page than the section that introduces them.  For
-example, in "Attention Is All You Need", the section "3 Model
-Architecture" begins on page 2 but the actual Transformer diagram
-("Figure 1: The Transformer — model architecture") is anchored to page 3.
+---
 
-To handle this, for every image the extractor scans the page text for
-"Figure N:", "Fig. N:", "Table N:", etc. and records the nearest such
-caption within 60 pt (above, below, or adjacent to the image).  The
-field looks like:
+## 🧪 Running Unit Tests & Fixtures
 
-```json
-"nearby_caption": {
-  "kind": "Figure",
-  "number": 1,
-  "snippet": "Figure 1: The Transformer - model architecture.",
-  "caption_rect": [210.0, 404.7, 401.9, 414.7],
-  "image_rect":   [196.5,  72.0, 415.4, 394.4],
-  "relative_position": "below",
-  "distance_pt": 10.3
-}
-```
-
-So an agent that needs "the model architecture diagram" can now do
-`grep -i "model architecture" manifest.json` and find it directly,
-instead of guessing by page number.  When the image has no nearby
-caption (e.g. a decorative banner), `nearby_caption` is `null`.
-
-### `text_overlay` — figuring out what text is on top of / beside each image
-
-PDFs often place text in spatial relation to an image: a callout label
-on top of a chart bar, a caption to the right, a note below, etc.  The
-`text_overlay` field classifies every text block on the same page into
-one of two categories based on its bbox vs the image's bbox:
-
-| Category | Meaning |
-| --- | --- |
-| `on_top`    | The text bbox intersects the image bbox.  This is a real "label drawn on the chart" / "annotation over the photo". |
-| `beside.<side>` | The text sits adjacent to the image on the named side (`left`, `right`, `above`, `below`) within 24 pt, and overlaps the image on the perpendicular axis.  This covers "caption to the right of a figure", "footnote below", etc. |
-
-Example (from the `overlay.pdf` fixture, page 2):
-
-```json
-"text_overlay": {
-  "on_top": [],
-  "beside": {
-    "right": [
-      {
-        "text": "Figure A: This caption is a real text object ...",
-        "bbox": [370.0, 90.0, 539.5, 221.9],
-        "distance_pt": 18.0
-      }
-    ],
-    "left":   [],
-    "above":  [],
-    "below":  []
-  }
-}
-```
-
-This means: the image has no text on top of it, but there's a text block
-18 pt to the right that overlaps the image vertically — i.e. it's a
-caption sitting beside the figure.
-
-When the image has no associated text (e.g. a decorative banner, or —
-crucially — an image whose labels were baked into the pixels), all
-categories are empty:
-
-```json
-"text_overlay": { "on_top": [], "beside": {"left": [], "right": [], "above": [], "below": []} }
-```
-
-**The "burned-in pixels" caveat.** If the PDF author rendered labels
-*as part of the image* (e.g. a chart exported from Excel where the axis
-labels are pixels, not separate text), neither `get_text()` nor the
-manifest can see them — only OCR could recover them.  An empty
-`text_overlay` together with the existence of the image is your
-signal that OCR is needed.
-
-## How it works (in 30 seconds)
-
-1. **Text:** for every page, call `page.get_text("text")` and concatenate,
-   with a `PAGE n` separator so each page's text is easy to find.
-2. **Raster images:** for every page, call `page.get_images(full=True)` to get each
-   `xref` + dimensions.  Then call `doc.extract_image(xref)` to pull the raw
-   bytes (preserving the original format: png/jpeg/etc.) and write them out.
-3. **Soft masks (`/SMask`):** if the image has a transparency mask, the
-   script reconstructs the full RGBA pixmap with PyMuPDF's `Pixmap(pix, mask)`
-   and saves it as PNG so the alpha channel is preserved.
-4. **De-duplication:** each `xref` is only saved once, but every page that
-   references it is recorded in the manifest.
-5. **Stencil masks / tiny pixels:** images smaller than `--min-dim` on either
-   side are skipped and logged — these are usually PDF transparency layers.
-6. **Vector-only figures:** many academic / technical PDFs draw figures as
-   vector graphics (lines, polygons, text labels) instead of embedding a
-   raster image — `get_images()` returns zero hits for these.  The extractor
-   has a second pass that detects pages with significant vector content
-   (many drawings or large path bboxes) and renders the bounding box of the
-   drawing cluster to a PNG via `page.get_pixmap(clip=…)` at 200 DPI.
-   These entries are recorded in the manifest with `kind: "vector_render"`,
-   the original `source_bbox_pt`, and the `drawing_count`.
-7. **Nearby-caption lookup:** for every image, the script locates the image
-   rect on its page (`Page.get_image_rects(xref)`) and looks for the closest
-   "Figure N:" / "Fig. N:" / "Table N:" caption within 60 pt.  This is
-   recorded as `nearby_caption` in the manifest so downstream agents can
-   find images by content (e.g. "the model architecture diagram") instead
-   of guessing by page number — see the next section for why this matters.
-8. **Text overlay classification:** for every image, the script also walks
-   the same page's text blocks and classifies each one as either `on_top`
-   (bbox intersects the image) or `beside.<side>` (sits adjacent on the
-   left/right/above/below within 24 pt, with perpendicular-axis overlap).
-   This lets a downstream agent answer "what label is on top of this
-   chart?" or "what caption sits beside this image?" without doing
-   geometry of its own.
-9. **Table detection:** `page.find_tables()` is PyMuPDF's built-in table
-   detector.  For every detected table, the extractor writes a Markdown
-   file under `tables/` and records `bbox`, `row_count`, `col_count`,
-   and (if find_tables can guess it) the `header` column names in the
-   manifest.  A sanity check rejects "tables" that are actually dense
-   grids of vector drawings (e.g. attention-head visualizations in a
-   research paper) so they don't pollute the output.
-10. **Multi-column detection:** for every page, the extractor groups text
-    blocks by their left-edge x-position.  Pages with 2+ distinct columns
-    each having 2+ blocks get reported in `layout.json`, with per-column
-    bboxes.  Wide top blocks (titles / banners that span the page) are
-    excluded so they don't force every column to look the same width.
-11. **Drawing classification:** for every page, the script looks at the
-    number of `lines`, `rects`, `curves`, and `quads` returned by
-    `get_drawings()` and labels the page as one of: `sketch` (curves +
-    freeform strokes, e.g. hand-drawn sketch), `grid` (many horizontal
-    lines, e.g. ruled notebook paper or a table grid), `flowchart`
-    (rectangles + connecting lines), `decorative` (few shapes), or
-    `unknown`.  The result lands in `drawings.json`.
-
-## Real-world layout coverage
-
-The extractor is built to handle the messy things real PDFs do.  The
-`realworld.pdf` fixture exercises the most common cases; each row is
-something the extractor now recovers automatically.
-
-| Case on the page                        | What the extractor produces                              |
-| --------------------------------------- | -------------------------------------------------------- |
-| Hand-drawn-style sketch (Béziers, arrow) | Vector-rendered PNG (`page001_vec01.png`); labeled `sketch` in `drawings.json` |
-| Ruled notebook grid                     | Vector-rendered PNG of the whole grid region             |
-| Real data table (3×4 with header)        | `tables/page003_table01.md` as Markdown; `row_count`/`col_count` in manifest |
-| Multi-column article (2 cols + sidebar) | 2 columns reported in `layout.json` with per-column bboxes |
-| Newspaper layout (banner + body + table + footer) | All text + table + columns detected                      |
-| Flowchart / org chart (boxes + arrows)   | Vector-rendered PNG; labeled `flowchart` in `drawings.json` |
-
-## Testing it
+The repository includes standalone fixture scripts to verify extraction correctness:
 
 ```bash
-source .venv/bin/activate
-python make_fixture.py              # builds sample.pdf (3 pages, text + 3 images)
+# Build test PDF fixtures
+python make_fixture.py
+python make_overlay_fixture.py
+python make_realworld_fixture.py
+
+# Run extractor & verification suite
 python extract_pdf.py sample.pdf
-python test_extract.py              # confirms extracted image bytes are correct
-
-python make_chart.py                # builds chart.png (a chart with burned-in labels)
-python make_overlay_fixture.py      # builds overlay.pdf (4 pages, exercises all 3 overlay cases)
-python extract_pdf.py overlay.pdf
-python show_overlay.py              # shows the text_overlay classification per image
-
-python make_realworld_fixture.py    # builds realworld.pdf (6 pages: sketch, grid, table, multi-col, newspaper, flowchart)
-python extract_pdf.py realworld.pdf
-# Inspect: ls realworld_extracted/extract_images/
-#          ls realworld_extracted/tables/
-#          cat realworld_extracted/layout.json
-#          cat realworld_extracted/drawings.json
+python test_extract.py sample_extracted/extract_images
 ```
 
-Expected `test_extract.py` output:
+---
 
-```
-page001_img01_xref8.png: (256, 256) center=(220, 50, 50) expected~(220, 50, 50) OK=True
-page002_img01_xref16.png: (256, 256) center=(40, 170, 80) expected~(40, 170, 80) OK=True
-page002_img02_xref18.png: (256, 256) center=(40, 80, 220) expected~(40, 80, 220) OK=True
-ALL OK
-```
+## 📄 License
 
-## Errors
-
-| Situation                   | Behaviour                                                |
-| --------------------------- | -------------------------------------------------------- |
-| PyMuPDF not installed       | Prints a clear install hint and exits with code 2.       |
-| PDF path doesn't exist      | `ERROR: PDF not found: <path>` and exits with code 1.    |
-| Path is a directory         | `ERROR: Expected a PDF file, got a directory: <path>`    |
-| PyMuPDF fails to open file  | The underlying error is wrapped and reported.            |
-| An individual image fails   | That image is skipped and the failure is recorded in the log. |
+MIT License — free for personal, academic, and commercial use.
