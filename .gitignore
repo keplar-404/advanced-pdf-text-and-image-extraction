@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Extracted output folders (generated, not source)
+*_extracted/
+
+# Generated test fixtures (built by make_*.py scripts)
+sample.pdf
+sample_extracted/
+overlay.pdf
+overlay_extracted/
+realworld.pdf
+realworld_extracted/
+chart.png
+red.png
+green.png
+blue.png
+
+# Temporary test renders
+test_fig*.png
+figure_p*.png
+full_page_*.png
+test_p*.png
+
+# OS files
+.DS_Store
+Thumbs.db
