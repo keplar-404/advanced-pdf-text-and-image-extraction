@@ -9,6 +9,8 @@
 Most PDF tools struggle with vector diagrams, flowcharts, or tables, often cropping off labels or skipping non-image figures entirely. This tool fixes that:
 
 - 📝 **Full Text Extraction**: Extracts clean plain text with clear page markers.
+- 🧮 **Math OCR & LaTeX Formula Conversion**: Uses Pix2Text to convert garbled PDF equations into clean LaTeX (`$$ ... $$`).
+- 🤖 **LLM-Friendly Markdown Export**: Assembles a single `extract_llm.md` file with embedded images, tables, LaTeX math, and TOC navigation for AI models.
 - 🖼️ **Embedded Photo Extraction**: Extracts all high-res photos (JPEG/PNG).
 - 🎨 **Vector Diagram & Flowchart Capture**: Automatically crops flowcharts, pie charts, and chemical molecules **with all text labels intact**.
 - 📊 **Smart Table Detection**: Converts complex tables into clean Markdown (`.md`) format using machine learning layout analysis.
@@ -52,10 +54,10 @@ python -m venv .venv
 
 ### Step 3: Install Required Packages
 
-Run this single command to install all dependencies:
+Run this single command to install dependencies:
 
 ```bash
-python -m pip install pymupdf pillow pymupdf-layout
+python -m pip install pymupdf pillow pymupdf-layout pix2text
 ```
 
 | Package | What it does |
@@ -63,15 +65,20 @@ python -m pip install pymupdf pillow pymupdf-layout
 | `pymupdf` | Parses PDF pages, extracts text, images, and drawings |
 | `pillow` | Saves and converts images into PNG/JPEG format |
 | `pymupdf-layout` | Machine learning model for advanced table boundary detection |
+| `pix2text` | Math OCR engine that converts equations into LaTeX format |
 
 ---
 
 ### Step 4: Extract Your PDF!
 
-Run the script on any PDF file:
+Run the main extraction script on any PDF file:
 
 ```bash
+# 1. Basic extraction (Text, Figures, Tables, and extract_llm.md)
 python extract_pdf.py path/to/your_document.pdf
+
+# 2. Convert mathematical equations to LaTeX formulas
+python math_ocr.py path/to/your_document.pdf --save-eq-images
 ```
 
 🎉 **Done!** An output folder named `your_document_extracted/` will be created right next to your PDF.
@@ -84,13 +91,18 @@ Inside the generated output directory:
 
 ```
 your_document_extracted/
+├── extract_llm.md                 # 🤖 Unified LLM-friendly Markdown with inline figures, tables & LaTeX math
+├── llm_summary.json               # Machine-readable Table of Contents & document index
 ├── extract.txt                    # Complete plain text of the PDF with page dividers
+├── extract_math.txt               # Plain text with math formulas converted to LaTeX
+├── math_manifest.json             # Detailed JSON index of all detected equations
 ├── extract_log.txt                # Processing log and timestamps
 ├── layout.json                    # Column layout details per page
 ├── drawings.json                  # Vector shape details
 ├── tables/                        # Markdown files for every table found
 │   ├── page016_table01.md
 │   └── page038_table01.md
+├── equation_images/               # Crop images and .tex files for all OCR'd equations
 └── extract_images/                # Extracted images and figures
     ├── manifest.json              # Machine-readable JSON index with captions & metadata
     ├── page016_vec01.png          # Complete flowchart (with text labels)
@@ -108,8 +120,11 @@ You can customize how the script runs with optional flags:
 # 1. Custom output directory
 python extract_pdf.py my_doc.pdf --output-dir /path/to/my_output/
 
-# 2. Filter out tiny icon pixels (default minimum size is 8px)
-python extract_pdf.py my_doc.pdf --min-dim 16
+# 2. Run Math OCR post-processing with equation crop images saved
+python math_ocr.py my_doc.pdf --save-eq-images
+
+# 3. Build standalone LLM Markdown document
+python build_llm_document.py my_doc.pdf
 ```
 
 ---

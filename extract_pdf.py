@@ -1382,6 +1382,19 @@ def main(argv: list[str] | None = None) -> int:
         drawings = extract_drawing_summary(doc, log)
 
         _write_outputs(output_dir, text, manifest, log, layout, drawings)
+
+        # Build LLM-friendly document (extract_llm.md)
+        try:
+            import build_llm_document
+            print("Building LLM-friendly document (extract_llm.md) …")
+            build_llm_document.build_llm_markdown(
+                args.pdf,
+                output_dir,
+                output_dir / "extract_llm.md",
+                output_dir / "llm_summary.json",
+            )
+        except Exception as exc:
+            log.append(f"  ! build_llm_document failed: {exc}")
     finally:
         doc.close()
 
@@ -1399,6 +1412,7 @@ def main(argv: list[str] | None = None) -> int:
         f"Images saved        : {len(image_files)} files in {images_dir}",
         f"Tables saved        : {len(table_files)} files in {tables_dir}",
         f"Text file           : {output_dir / TEXT_FILENAME}",
+        f"LLM Document        : {output_dir / 'extract_llm.md'}",
         f"Manifest            : {images_dir / MANIFEST_FILENAME}",
         f"Layout              : {output_dir / 'layout.json'}",
         f"Drawing summary     : {output_dir / 'drawings.json'}",
