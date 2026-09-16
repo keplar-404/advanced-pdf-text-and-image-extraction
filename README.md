@@ -55,7 +55,7 @@ python -m venv .venv
 Run this single command to install all dependencies:
 
 ```bash
-pip install pymupdf pillow pymupdf-layout
+python -m pip install pymupdf pillow pymupdf-layout
 ```
 
 | Package | What it does |
